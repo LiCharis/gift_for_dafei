@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>五月天专属虚拟演唱会</title>
+  <style>
+    body {
+      font-family: 'Microsoft YaHei', Arial, sans-serif;
+      background: #000;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      text-align: center;
+    }
+    
+    h1 {
+      color: #f5b663;
+      margin-bottom: 30px;
+    }
+    
+    .concert-container {
+      background: rgba(50, 50, 50, 0.8);
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 0 20px rgba(245, 182, 99, 0.3);
+    }
+    
+    #concert-intro p {
+      margin-bottom: 15px;
+      font-size: 18px;
+      line-height: 1.6;
+    }
+    
+    button {
+      background: #f5b663;
+      border: none;
+      color: #333;
+      padding: 10px 25px;
+      border-radius: 25px;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 10px 0;
+      transition: all 0.3s ease;
+    }
+    
+    button:hover {
+      background: #e09a42;
+      transform: scale(1.05);
+    }
+    
+    .song-btn {
+      padding: 8px 15px;
+      margin: 5px;
+      font-size: 14px;
+    }
+    
+    #stage-background {
+      position: relative;
+      width: 100%;
+      height: 300px;
+      background: url('https://i.imgur.com/IfHmwzW.jpg') no-repeat center;
+      background-size: cover;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    
+    #stage-screen {
+      position: absolute;
+      top: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 70%;
+      height: 80px;
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 5px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 20px;
+    }
+    
+    .song-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin: 20px 0;
+    }
+    
+    #concert-finale .finale-animation {
+      height: 300px;
+      position: relative;
+      background: #000;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    
+    .finale-screen {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 80%;
+      padding: 20px;
+      background: #000;
+      border: 3px solid #f5b663;
+      border-radius: 10px;
+      text-align: center;
+    }
+    
+    .finale-message {
+      margin: 30px 0;
+    }
+    
+    .finale-message p:first-child {
+      font-size: 24px;
+      margin-bottom: 15px;
+    }
+    
+    .finale-message p:last-child {
+      font-style: italic;
+      color: #ccc;
+      font-size: 18px;
+    }
+    
+    @keyframes flicker {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+    
+    .light {
+      position: absolute;
+      border-radius: 50%;
+      animation: flicker 2s infinite alternate;
+    }
+    
+    .light-1 {
+      top: -20px;
+      left: 20%;
+      width: 40px;
+      height: 60px;
+      background: radial-gradient(circle, rgba(255,165,0,0.7) 0%, rgba(255,165,0,0) 70%);
+      animation-duration: 2s;
+    }
+    
+    .light-2 {
+      top: -20px;
+      left: 50%;
+      width: 40px;
+      height: 60px;
+      background: radial-gradient(circle, rgba(255,0,0,0.7) 0%, rgba(255,0,0,0) 70%);
+      animation-duration: 3s;
+    }
+    
+    .light-3 {
+      top: -20px;
+      left: 80%;
+      width: 40px;
+      height: 60px;
+      background: radial-gradient(circle, rgba(0,255,255,0.7) 0%, rgba(0,255,255,0) 70%);
+      animation-duration: 2.5s;
+    }
+    
+    .back-to-card {
+      margin-top: 30px;
+    }
+    
+    .back-to-card a {
+      color: #f5b663;
+      text-decoration: none;
+    }
+    
+    .back-to-card a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>五月天专属虚拟演唱会</h1>
+    
+    <div class="concert-container">
+      <div id="concert-container">
+        <div id="concert-intro">
+          <p>五月天为你准备了一场专属演唱会！</p>
+          <p>选择你喜欢的歌曲，享受这场为你定制的生日演出吧！</p>
+          <button id="start-concert">进入演唱会</button>
+        </div>
+        
+        <div id="concert-stage" style="display: none;">
+          <div id="stage-background">
+            <!-- 舞台灯光效果 -->
+            <div class="stage-lights">
+              <div class="light light-1"></div>
+              <div class="light light-2"></div>
+              <div class="light light-3"></div>
+            </div>
+            
+            <!-- 大屏幕 -->
+            <div id="stage-screen">
+              <p id="current-song-display">请选择一首歌曲</p>
+            </div>
+          </div>
+          
+          <div id="song-selection">
+            <p>选择一首歌曲：</p>
+            <div class="song-buttons">
+              <button class="song-btn" data-song="jujiang">倔强</button>
+              <button class="song-btn" data-song="zhizu">知足</button>
+              <button class="song-btn" data-song="wenrou">温柔</button>
+              <button class="song-btn" data-song="ruyan">如烟</button>
+            </div>
+          </div>
+          
+          <div id="concert-controls">
+            <audio id="concert-audio" controls style="width: 100%;">
+              <source src="" type="audio/mpeg">
+            </audio>
+          </div>
+          
+          <button id="final-surprise" style="display: none;">演唱会惊喜</button>
+          
+          <div id="songs-played-counter">
+            已欣赏：<span id="songs-count">0</span>/3
+          </div>
+        </div>
+        
+        <div id="concert-finale" style="display: none;">
+          <div class="finale-animation">
+            <div class="finale-screen">
+              <p style="margin: 0; font-size: 24px; color: #f5b663;">生日快乐！</p>
+              <p style="margin: 15px 0; font-size: 18px;">愿你如五月天的音乐一样，</p>
+              <p style="margin: 0; font-size: 18px;">充满力量，温柔，知足且倔强！</p>
+            </div>
+          </div>
+          
+          <div class="finale-message">
+            <p>五月天送给你的专属演唱会圆满结束！</p>
+            <p>"如果生命是一首歌，愿你的每一天都如歌词般动人"</p>
+          </div>
+          
+          <button id="restart-concert">再看一次</button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="back-to-card">
+      <a href="./Memories.html">返回生日贺卡</a>
+    </div>
+  </div>
+  
+  <script>
+    // 歌曲数据
+    const concertSongs = {
+      'jujiang': {
+        title: '倔强',
+        src: '../music/mayday-jujiang.mp3'
+      },
+      'zhizu': {
+        title: '知足',
+        src: '../music/mayday-zhizu.mp3'
+      },
+      'wenrou': {
+        title: '温柔',
+        src: '../music/mayday-wenrou.mp3'
+      },
+      'ruyan': {
+        title: '如烟',
+        src: '../music/mayday-ruyan.mp3'
+      }
+    };
+    
+    let songsPlayed = 0;
+    
+    // 开始演唱会
+    document.getElementById('start-concert').addEventListener('click', function() {
+      document.getElementById('concert-intro').style.display = 'none';
+      document.getElementById('concert-stage').style.display = 'block';
+    });
+    
+    // 设置歌曲按钮事件
+    document.querySelectorAll('.song-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const songKey = this.getAttribute('data-song');
+        playConcertSong(songKey);
+        
+        // 高亮当前选中的按钮
+        document.querySelectorAll('.song-btn').forEach(b => b.style.fontWeight = 'normal');
+        this.style.fontWeight = 'bold';
+      });
+    });
+    
+    function playConcertSong(songKey) {
+      const song = concertSongs[songKey];
+      const audio = document.getElementById('concert-audio');
+      
+      // 设置音频源
+      audio.src = song.src;
+      audio.load();
+      audio.play();
+      
+      // 更新舞台显示
+      document.getElementById('current-song-display').textContent = `正在演唱：${song.title}`;
+      
+      // 更新已播放歌曲计数
+      if (!audio.hasAttribute('data-counted-' + songKey)) {
+        audio.setAttribute('data-counted-' + songKey, 'true');
+        songsPlayed++;
+        document.getElementById('songs-count').textContent = songsPlayed;
+        
+        // 检查是否已播放足够的歌曲
+        if (songsPlayed >= 3) {
+          document.getElementById('final-surprise').style.display = 'inline-block';
+        }
+      }
+    }
+    
+    // 最终惊喜按钮
+    document.getElementById('final-surprise').addEventListener('click', function() {
+      document.getElementById('concert-stage').style.display = 'none';
+      document.getElementById('concert-finale').style.display = 'block';
+    });
+    
+    // 重新观看演唱会
+    document.getElementById('restart-concert').addEventListener('click', function() {
+      document.getElementById('concert-finale').style.display = 'none';
+      document.getElementById('concert-stage').style.display = 'block';
+    });
+  </script>
+</body>
+</html> 

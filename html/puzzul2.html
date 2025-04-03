@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>拼图挑战</title>
+  <style>
+    body {
+      background: #222;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .puzzle-game {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 400px;
+      background: rgba(0, 0, 0, 0.8);
+      border-radius: 15px;
+      padding: 20px;
+      text-align: center;
+    }
+    h3 {
+      color: #f5b663;
+      margin-bottom: 15px;
+      font-size: 22px;
+    }
+    .difficulty-selector {
+      margin-bottom: 15px;
+    }
+    .diff-btn {
+      background: #f5b663;
+      border: none;
+      color: #333;
+      margin: 0 5px;
+      padding: 5px 10px;
+      border-radius: 15px;
+      cursor: pointer;
+    }
+    .diff-btn.active {
+      font-weight: bold;
+    }
+    #puzzle-container {
+      width: 300px;
+      height: 300px;
+      margin: 0 auto;
+      position: relative;
+      background: #333;
+    }
+    .puzzle-piece {
+      position: absolute;
+      border: 1px solid #000;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .puzzle-piece.selected {
+      border: 2px solid #f5b663; /* 选中时的边框样式 */
+    }
+    #preview-image {
+      margin: 15px auto;
+      width: 150px;
+      height: 150px;
+      border: 2px solid #f5b663;
+    }
+    #preview-image img {
+      width: 100%;
+      height: 100%;
+    }
+    #start-puzzle {
+      background: #f5b663;
+      border: none;
+      color: #333;
+      padding: 8px 20px;
+      border-radius: 20px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    #completion-message {
+      margin-top: 15px;
+      display: none;
+    }
+    #completion-message p {
+      color: #fff;
+      font-size: 18px;
+    }
+    #completion-message p:nth-child(2) {
+      color: #f5b663;
+      font-size: 16px;
+      font-style: italic;
+    }
+    #swap-count {
+      color: #f5b663;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="puzzle-game">
+    <h3>拼图挑战</h3>
+    
+    <div class="difficulty-selector">
+      <button class="diff-btn active" onclick="setDifficulty(3)">简单</button>
+      <button class="diff-btn" onclick="setDifficulty(4)">中等</button>
+      <button class="diff-btn" onclick="setDifficulty(5)">困难</button>
+    </div>
+    
+    <div id="puzzle-container" style="display: none;"></div>
+    
+    <div id="preview-image">
+      <img src="../img/中南.jpg" alt="五月天专辑封面">
+    </div>
+    
+    <button id="start-puzzle">开始游戏</button>
+    
+    <div id="swap-count"></div>
+    
+    <div id="completion-message">
+      <p>恭喜你完成拼图！</p>
+  </div>
+
+  <script>
+    let puzzleSize = 3; // 默认难度
+    let pieces = []; // 拼图块逻辑位置
+    let pieceElements = []; // 拼图块 DOM 元素
+    let emptyCell = {}; // 空白格子位置
+    let isPlaying = false;
+    let swapCount = 3; // 交换次数限制
+    let selectedPiece = null; // 当前选中的拼图块
+
+    // 设置难度
+    function setDifficulty(size) {
+      puzzleSize = size;
+      document.querySelectorAll('.diff-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+
+    // 开始/重置游戏
+    document.getElementById('start-puzzle').addEventListener('click', function() {
+      if (!isPlaying) {
+        startPuzzle();
+        this.textContent = '重新开始';
+      } else {
+        resetPuzzle();
+      }
+    });
+
+    // 开始拼图
+    function startPuzzle() {
+      isPlaying = true;
+      swapCount = 10; // 重置交换次数
+      selectedPiece = null;
+      updateSwapCount();
+      document.getElementById('puzzle-container').style.display = 'block';
+      document.getElementById('completion-message').style.display = 'none';
+      createPuzzle();
+    }
+
+    // 重置拼图
+    function resetPuzzle() {
+      const container = document.getElementById('puzzle-container');
+      container.innerHTML = '';
+      startPuzzle();
+    }
+
+    // 创建拼图
+    function createPuzzle() {
+      const container = document.getElementById('puzzle-container');
+      container.innerHTML = '';
+      const pieceSize = 300 / puzzleSize;
+
+      // 初始化拼图数组
+      pieces = Array(puzzleSize * puzzleSize).fill(null);
+      pieceElements = [];
+      for (let i = 0; i < puzzleSize * puzzleSize - 1; i++) {
+        pieces[i] = i;
+      }
+      emptyCell = { row: puzzleSize - 1, col: puzzleSize - 1 };
+
+      // 打乱拼图
+      shufflePuzzle();
+
+      // 创建拼图块
+      for (let i = 0; i < puzzleSize; i++) {
+        for (let j = 0; j < puzzleSize; j++) {
+          const index = i * puzzleSize + j;
+          const pieceValue = pieces[index];
+
+          if (pieceValue !== null) {
+            const piece = document.createElement('div');
+            piece.className = 'puzzle-piece';
+            piece.style.width = pieceSize + 'px';
+            piece.style.height = pieceSize + 'px';
+            piece.style.left = (j * pieceSize) + 'px';
+            piece.style.top = (i * pieceSize) + 'px';
+            piece.style.backgroundImage = "url('../img/中南.jpg')";
+            piece.style.backgroundSize = `${pieceSize * puzzleSize}px ${pieceSize * puzzleSize}px`;
+
+            // 设置背景位置
+            const bgRow = Math.floor(pieceValue / puzzleSize);
+            const bgCol = pieceValue % puzzleSize;
+            piece.style.backgroundPosition = `${-(bgCol * pieceSize)}px ${-(bgRow * pieceSize)}px`;
+
+            piece.dataset.value = pieceValue;
+            piece.dataset.currentIndex = index;
+
+            // 点击事件：移动或选择交换
+            piece.addEventListener('click', function() {
+              const currentIndex = parseInt(this.dataset.currentIndex);
+              const row = Math.floor(currentIndex / puzzleSize);
+              const col = currentIndex % puzzleSize;
+
+              if (selectedPiece) {
+                // 如果已经选中一个拼图块，则尝试交换
+                swapPieces(selectedPiece, this);
+                selectedPiece.classList.remove('selected');
+                selectedPiece = null;
+              } else if (canMove(row, col)) {
+                // 如果未选中拼图块且可以移动，则执行移动
+                movePiece(this, row, col, currentIndex);
+              } else if (swapCount > 0) {
+                // 如果不能移动且有交换次数，则选中此拼图块
+                this.classList.add('selected');
+                selectedPiece = this;
+              }
+            });
+
+            container.appendChild(piece);
+            pieceElements[index] = piece;
+          }
+        }
+      }
+    }
+
+    // 检查是否可以移动
+    function canMove(row, col) {
+      return (
+        (Math.abs(row - emptyCell.row) === 1 && col === emptyCell.col) ||
+        (Math.abs(col - emptyCell.col) === 1 && row === emptyCell.row)
+      );
+    }
+
+    // 移动拼图块
+    function movePiece(piece, row, col, currentIndex) {
+      const emptyIndex = emptyCell.row * puzzleSize + emptyCell.col;
+      const pieceSize = 300 / puzzleSize;
+
+      pieces[emptyIndex] = pieces[currentIndex];
+      pieces[currentIndex] = null;
+      piece.dataset.currentIndex = emptyIndex;
+
+      piece.style.left = (emptyCell.col * pieceSize) + 'px';
+      piece.style.top = (emptyCell.row * pieceSize) + 'px';
+
+      emptyCell.row = row;
+      emptyCell.col = col;
+
+      checkCompletion();
+    }
+
+    // 交换两个拼图块
+    function swapPieces(piece1, piece2) {
+      if (swapCount <= 0 || piece1 === piece2) return;
+
+      const index1 = parseInt(piece1.dataset.currentIndex);
+      const index2 = parseInt(piece2.dataset.currentIndex);
+      const pieceSize = 300 / puzzleSize;
+
+      // 交换 pieces 数组中的值
+      [pieces[index1], pieces[index2]] = [pieces[index2], pieces[index1]];
+
+      // 更新 DOM 位置
+      const tempLeft = piece1.style.left;
+      const tempTop = piece1.style.top;
+      piece1.style.left = piece2.style.left;
+      piece1.style.top = piece2.style.top;
+      piece2.style.left = tempLeft;
+      piece2.style.top = tempTop;
+
+      // 更新 currentIndex
+      piece1.dataset.currentIndex = index2;
+      piece2.dataset.currentIndex = index1;
+
+      // 如果交换涉及空白格子，更新 emptyCell
+      if (pieces[index1] === null) {
+        emptyCell.row = Math.floor(index1 / puzzleSize);
+        emptyCell.col = index1 % puzzleSize;
+      } else if (pieces[index2] === null) {
+        emptyCell.row = Math.floor(index2 / puzzleSize);
+        emptyCell.col = index2 % puzzleSize;
+      }
+
+      swapCount--;
+      updateSwapCount();
+      checkCompletion();
+    }
+
+    // 打乱拼图
+    function shufflePuzzle() {
+      for (let i = 0; i < 200; i++) {
+        const possibleMoves = [];
+        if (emptyCell.row > 0) possibleMoves.push({ row: emptyCell.row - 1, col: emptyCell.col });
+        if (emptyCell.row < puzzleSize - 1) possibleMoves.push({ row: emptyCell.row + 1, col: emptyCell.col });
+        if (emptyCell.col > 0) possibleMoves.push({ row: emptyCell.row, col: emptyCell.col - 1 });
+        if (emptyCell.col < puzzleSize - 1) possibleMoves.push({ row: emptyCell.row, col: emptyCell.col + 1 });
+
+        const move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+        const moveIndex = move.row * puzzleSize + move.col;
+        const emptyIndex = emptyCell.row * puzzleSize + emptyCell.col;
+
+        pieces[emptyIndex] = pieces[moveIndex];
+        pieces[moveIndex] = null;
+        emptyCell.row = move.row;
+        emptyCell.col = move.col;
+      }
+    }
+
+    // 检查拼图是否完成
+    function checkCompletion() {
+      let completed = true;
+      for (let i = 0; i < puzzleSize * puzzleSize - 1; i++) {
+        if (pieces[i] !== i) {
+          completed = false;
+          break;
+        }
+      }
+      if (completed && pieces[puzzleSize * puzzleSize - 1] === null) {
+        document.getElementById('puzzle-container').style.display = 'none';
+        document.getElementById('completion-message').style.display = 'block';
+        document.getElementById('start-puzzle').textContent = '再玩一次';
+        isPlaying = false;
+      }
+    }
+
+    // 更新交换次数显示
+    function updateSwapCount() {
+      document.getElementById('swap-count').textContent = `剩余交换次数：${swapCount}`;
+    }
+  </script>
+</body>
+</html>

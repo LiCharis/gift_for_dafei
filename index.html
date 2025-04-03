@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="zh">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Happy Birthday</title>
+	<link rel="stylesheet" type="text/css" href="css/styles.css">
+
+</head>
+
+<style>
+
+.iframepage {
+        -webkit-overflow-scrolling: touch;
+        overflow-x: scroll;
+        overflow-y: hidden;
+    }
+
+    ::-webkit-scrollbar {
+        width: 0px;
+    }
+
+    /*局部滚动的dom节点*/
+    .scroll-el {
+        overflow: auto;
+    }
+
+	.mayday-lyrics {
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		pointer-events: none;
+	}
+
+	.lyrics-text {
+		position: absolute;
+		color: #f5b663;
+		font-size: 1.2rem;
+		text-shadow: 0 0 10px rgba(245, 182, 99, 0.5);
+		opacity: 0;
+		animation: fadeInOut 5s infinite;
+	}
+
+	@keyframes fadeInOut {
+		0%, 100% { opacity: 0; }
+		50% { opacity: 1; }
+	}
+
+	.lyrics-1 { top: 15%; left: 20%; animation-delay: 0s; }
+	.lyrics-2 { top: 25%; right: 20%; animation-delay: 1s; }
+	.lyrics-3 { bottom: 25%; left: 15%; animation-delay: 2s; }
+	.lyrics-4 { bottom: 15%; right: 15%; animation-delay: 3s; }
+
+	h2.spotlight-text {
+		color: #333;
+		font-family: Helvetica;
+		padding: 0;
+		font-size:35px;
+		letter-spacing: -0.1rem;
+		position: relative;
+		text-align: center;
+	}
+  
+	h2.spotlight-text::after {
+		content: attr(data-spotlight);
+		color: transparent;
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		-webkit-clip-path: ellipse(100px 100px at 0% 50%);
+		clip-path: ellipse(100px 100px at 0% 50%);
+		animation: spotlight 5s infinite;
+		background-image: url(https://images.unsplash.com/photo-1579547621869-0ddb5f237392?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1500&q=80);
+		background-size: 150%;
+		background-position: center center;
+		-webkit-background-clip: text;
+		background-clip: text;
+	}
+  
+	@keyframes spotlight {
+		0% {
+		-webkit-clip-path: ellipse(100px 100px at 0% 50%);
+		clip-path: ellipse(100px 100px at 0% 50%);
+		}
+		
+		50% {
+		-webkit-clip-path: ellipse(100px 100px at 100% 50%);
+		clip-path: ellipse(100px 100px at 100% 50%);
+		}
+		
+		100% {
+		-webkit-clip-path: ellipse(100px 100px at 0% 50%);
+		clip-path: ellipse(100px 100px at 0% 50%);
+		}
+	}
+
+	.container {
+		position: relative;
+		z-index: 2;
+		padding: 30px;
+		background: transparent;
+	}
+
+	.cake-container {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 20px;
+	}
+
+	.cake-top {
+		width: 100%;
+		text-align: center;
+		transform: perspective(500px) rotateX(10deg);
+	}
+
+	.cake-form {
+		position: relative;
+		width: 320px;
+		height: 320px;
+		border-radius: 50%;
+		background: rgba(242, 238, 238, 0.6);
+		padding: 40px;
+		box-shadow: 
+			0 0 30px rgba(245, 182, 99, 0.3),
+			0 -10px 20px rgba(255, 255, 255, 0.1) inset;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		gap: 15px;
+	}
+
+	.cake-form::before {
+		content: '';
+		position: absolute;
+		top: -10px;
+		left: -10px;
+		right: -10px;
+		bottom: -10px;
+		border: 2px dashed #f5b663;
+		border-radius: 50%;
+		animation: rotate 20s linear infinite;
+	}
+
+	.cake-bottom {
+		width: 100%;
+		text-align: center;
+		transform: perspective(500px) rotateX(-10deg);
+	}
+
+	@keyframes rotate {
+		from { transform: rotate(0deg); }
+		to { transform: rotate(360deg); }
+	}
+
+	/* 五月天萝卜装饰 */
+    .radish-deco1 {
+        position: absolute;
+        width: 40px;
+        height: 40px;
+        background: url('../img/hu1.JPG') no-repeat center;
+        background-size: contain;
+        opacity: 0.7;
+        z-index: 1;
+        pointer-events: none; /* 防止干扰表单输入 */
+    }
+	/* 五月天萝卜装饰 */
+    .radish-deco2 {
+        position: absolute;
+        width: 40px;
+        height: 40px;
+        background: url('../img/hu2.JPG') no-repeat center;
+        background-size: contain;
+        opacity: 0.7;
+        z-index: 1;
+        pointer-events: none; /* 防止干扰表单输入 */
+    }/* 五月天萝卜装饰 */
+    .radish-deco3 {
+        position: absolute;
+        width: 40px;
+        height: 40px;
+        background: url('../img/hu3.JPG') no-repeat center;
+        background-size: contain;
+        opacity: 0.7;
+        z-index: 1;
+        pointer-events: none; /* 防止干扰表单输入 */
+    }
+
+    .radish-1 {
+        top: 3%;
+        left: 250px;
+        transform: rotate(15deg);
+    }
+
+    .radish-2 {
+        bottom: 15%;
+        right: 30%;
+        transform: rotate(-20deg);
+    }
+
+    .radish-3 {
+        top: 80%;
+        left: 30%;
+        transform: translateY(-50%) rotate(10deg);
+    }
+
+</style>
+
+<body>
+	<div class="htmleaf-container">
+		<div class="wrapper">
+			<div class="moon"></div>
+			<div>
+				<div class="star-1 stars"></div>
+				<div class="star-2 stars"></div>
+				<div class="star-3 stars"></div>
+				<div class="star-4 stars"></div>
+				 <div class="star-5 stars"></div>
+				<!-- <div class="star-6 stars"></div> -->
+				<!-- <div class="star-7 stars"></div>
+				<div class="star-10 stars"></div>
+				<div class="star-12 stars"></div>
+				<div class="star-15 stars"></div> -->
+				<!-- <div class="star-61 stars"></div> -->
+				<!-- <div class="star-63 stars"></div>
+				<div class="star-64 stars"></div> -->
+			</div>
+
+			<div class="mayday-lyrics">
+				<div class="lyrics-text lyrics-1">我和我最后的倔强</div>
+				<div class="lyrics-text lyrics-2">握紧双手绝对不放</div>
+				<div class="lyrics-text lyrics-3">下一站是不是天堂</div>
+				<div class="lyrics-text lyrics-4">就算失望不能绝望</div>
+			</div>
+
+			<div class="container">
+				<div class="cake-container">
+					
+					<!-- 添加萝卜装饰 -->
+					<div class="radish-deco1 radish-1"></div>
+					<div class="radish-deco2 radish-2"></div>
+					<div class="radish-deco3 radish-3"></div>
+					
+
+					
+					<div class="cake-form">
+						<h2 class="spotlight-text" data-spotlight="Happy Birthday">Happy&nbspBirthday</h2>
+						<form class="form" id="login-form">
+							<input id="userName" name="userName" type="text" placeholder="用户名" required>
+							<input id="pwd" name="pwd" type="password" placeholder="生日(例如:0101)" required>
+						</form>
+						<h2 class="spotlight-text" data-spotlight="MayDay">MayDay</h2>
+
+					</div>
+
+					
+				</div>
+			</div>
+
+			<ul class="bg-bubbles">
+				<li></li>
+				<li></li>
+				<li></li>
+				<li></li>
+				<li></li>
+				<li></li>
+				<li></li>
+				<li></li>
+				<li></li>
+				<li></li>
+			</ul>
+		</div>
+	</div>
+
+	<script>
+		// 修改音乐自动播放
+        const audio = document.createElement("audio");
+        audio.src = "music/昼夜 - 千与千寻 (钢琴版).mp3";
+        audio.autoplay = true;
+        audio.loop = true; // 添加循环播放
+        document.body.appendChild(audio);
+
+        // 确保音乐在页面加载时播放
+        document.addEventListener('DOMContentLoaded', function() {
+            audio.play().catch(function(error) {
+                console.log("自动播放被阻止:", error);
+                // 添加用户交互后播放的备用方案
+                document.body.addEventListener('click', function() {
+                    audio.play();
+                }, { once: true });
+            });
+        });
+	</script>
+	<script src="js/flower.js" type="text/javascript"></script>
+	<script src="js/jquery-2.1.1.min.js" type="text/javascript"></script>
+	<script src="js/jquery-1.8.4.min.js" type="text/javascript"></script>
+</body>
+</html>

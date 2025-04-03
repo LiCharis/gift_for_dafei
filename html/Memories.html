@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Happy Birthday</title>
+  <link rel="stylesheet" href="../css/jquery.fullPage.css">
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .puzzle-game {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      height: 100%;
+      background: rgb(0, 0, 0);
+      border-radius: 15px;
+      padding: 20px;
+      text-align: center;
+    }
+    h3 {
+      color: #f5b663;
+      margin-bottom: 15px;
+      font-size: 22px;
+    }
+    .difficulty-selector {
+      margin-bottom: 15px;
+    }
+    .diff-btn {
+      background: #f5b663;
+      border: none;
+      color: #333;
+      margin: 0 5px;
+      padding: 5px 10px;
+      border-radius: 15px;
+      cursor: pointer;
+    }
+    .diff-btn.active {
+      font-weight: bold;
+    }
+    #puzzle-container {
+      width: 300px;
+      height: 300px;
+      margin: 0 auto;
+      position: relative;
+      background: #333;
+    }
+    .puzzle-piece {
+      position: absolute;
+      border: 1px solid #000;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .puzzle-piece.selected {
+      border: 2px solid #f5b663; /* 选中时的边框样式 */
+    }
+    #preview-image {
+      margin: 15px auto;
+      width: 175px;
+      height: 175px;
+      border: 2px solid #f5b663;
+    }
+    #preview-image img {
+      width: 100%;
+      height: 100%;
+    }
+    #start-puzzle {
+      background: #f5b663;
+      border: none;
+      color: #333;
+      padding: 8px 20px;
+      border-radius: 20px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    #completion-message {
+      margin-top: 15px;
+      display: none;
+    }
+    #completion-message p {
+      color: #fff;
+      font-size: 18px;
+    }
+    #completion-message p:nth-child(2) {
+      color: #f5b663;
+      font-size: 16px;
+      font-style: italic;
+    }
+    #swap-count {
+      color: #f5b663;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bgcolor">
+    <div class="video-box">
+      <video class="video-background" preload="auto" loop playsinline autoplay src="lemon.mp4" tabindex="-1"
+        muted="muted"></video>
+      <div style="z-index:100;" id="dowebok">
+        <!--第一屏-->
+        <div class="section">
+          <div class="ly-box01">
+            <div class="ly-txt01">
+              <p class="ly-stxt01">等一缕春风起，看一朵花绽放</p>
+             <p class="ly-stxt02">轻盈摇曳，似一位优雅的独舞者</p>
+             <p class="ly-stxt03">拨动着生命的琴弦</p> 
+             <p class="ly-stxt04">在这个温柔的日子</p>
+              <p class="ly-stxt05">春天送来了你的生日</p> 
+            </div>
+            <div class="ly-txt02">
+              <p class="ly-stxt06">春雨滋润了大地万物</p> 
+              <p class="ly-stxt07">唤醒了含苞的花蕾</p> 
+              <p class="ly-stxt08">桃花和杏花羞红了脸庞</p> 
+              <p class="ly-stxt09">簇拥着托付春风传递盛开的喜悦</p>
+               <p class="ly-stxt10">顺带着此电子贺卡，以传达我的祝福</p> 
+            </div>
+            
+           
+          </div>
+        </div>
+
+        <!--第二屏-->
+        <div class="section">
+          <div class="timeline"></div>
+          <div class="timepoint11"></div>
+          <div class="ly-box11">
+            <div class="ly-txt11" style="width:100%;height:10%;left:10%">
+              <img class="ly-img11" src="../img/HappyBirthday.png" style="width:100%;height:100%">
+            </div>
+            <div class="ly-txt12">
+
+            </div>
+            <div class="ly-imgbox11" style="height:50%">
+              <img class="ly-img11"
+                src="https://img2.baidu.com/it/u=775296788,3596795793&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500"
+                style="height:100%">
+            </div>
+          </div>
+          <div class="ly-triangle11"></div>
+
+          <div class="ly-box12">
+            <div class="ly-txt13" style="width:100%;height:10%;left:10%">
+              <img class="ly-img11" src="../img/HappyBirthday.png" style="width:100%;height:100%">
+            </div>
+            <div class="ly-txt14">
+              <p>小寿星</p>
+              <p>送你一杯我精心调制的葡萄汁</p>
+              <p>里面包含100cc的心想事成</p>
+              <p>还有200cc的天天开心</p>
+              <p>更有300cc的活力十足</p>
+            </div>
+          
+          </div>
+          <div class="ly-triangle12"></div>
+
+          <!-- 互动式五月天歌词时间线 -->
+          <div class="mayday-timeline" style="position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 100%; background: transparent; border-radius: 15px; padding: 20px; z-index: 100;">
+            <h3 style="text-align: center; color: #f5b663; font-size: 22px;">我们的五月天时光机</h3>
+            <div class="timeline-container" style="display: flex; justify-content: space-between; position: relative; margin: 30px 0;">
+              <div class="timeline-line" style="position: absolute; top: 15px; left: 0; right: 0; height: 3px; background: #f5b663;"></div>
+              
+              <!-- 时间点1: 倔强 -->
+              <div class="timeline-point" style="position: relative; z-index: 5; text-align: center; cursor: pointer;" data-song="jujiang" onclick="playMaydaySong('jujiang')">
+                <div class="point" style="width: 30px; height: 30px; background: #f5b663; border-radius: 50%; margin: 0 auto;"></div>
+                <div class="year" style="margin-top: 8px; color: #fff; font-weight: bold;">相识</div>
+                <div class="lyrics" style="color: #ccc; font-style: italic; font-size: 14px; margin-top: 5px; width: 150px;">"我和我最后的倔强"</div>
+              </div>
+              
+              <!-- 时间点2: 知足 -->
+              <div class="timeline-point" style="position: relative; z-index: 5; text-align: center; cursor: pointer;" data-song="zhizu" onclick="playMaydaySong('zhizu')">
+                <div class="point" style="width: 30px; height: 30px; background: #f5b663; border-radius: 50%; margin: 0 auto;"></div>
+                <div class="year" style="margin-top: 8px; color: #fff; font-weight: bold;">成长</div>
+                <div class="lyrics" style="color: #ccc; font-style: italic; font-size: 14px; margin-top: 5px; width: 150px;">"怎么去拥有一道彩虹"</div>
+              </div>
+              
+              <!-- 时间点3: 温柔 -->
+              <div class="timeline-point" style="position: relative; z-index: 5; text-align: center; cursor: pointer;" data-song="wenrou" onclick="playMaydaySong('wenrou')">
+                <div class="point" style="width: 30px; height: 30px; background: #f5b663; border-radius: 50%; margin: 0 auto;"></div>
+                <div class="year" style="margin-top: 8px; color: #fff; font-weight: bold;">陪伴</div>
+                <div class="lyrics" style="color: #ccc; font-style: italic; font-size: 14px; margin-top: 5px; width: 150px;">"是谁说过摇滚万岁"</div>
+              </div>
+              
+              <!-- 时间点4: 如烟 -->
+              <div class="timeline-point" style="position: relative; z-index: 5; text-align: center; cursor: pointer;" data-song="ruyan" onclick="playMaydaySong('ruyan')">
+                <div class="point" style="width: 30px; height: 30px; background: #f5b663; border-radius: 50%; margin: 0 auto;"></div>
+                <div class="year" style="margin-top: 8px; color: #fff; font-weight: bold;">今天</div>
+                <div class="lyrics" style="color: #ccc; font-style: italic; font-size: 14px; margin-top: 5px; width: 150px;">"如果我们不曾相遇"</div>
+              </div>
+            </div>
+            
+            <div id="mayday-player" style="text-align: center; margin-top: 15px;">
+              <p id="current-lyrics" style="color: #fff; font-size: 16px; margin-bottom: 10px; min-height: 20px;"></p>
+              <audio id="mayday-timeline-audio" preload="auto"></audio>
+              <button id="timeline-play-btn" style="display: none; background: #f5b663; border: none; color: #333; padding: 6px 12px; border-radius: 20px; cursor: pointer; margin-top: 10px;">播放</button>
+            </div>
+          </div>
+          
+          <script>
+            function playMaydaySong(song) {
+              const audio = document.getElementById('mayday-timeline-audio');
+              const lyricsDisplay = document.getElementById('current-lyrics');
+              // const playButton = document.getElementById('timeline-play-btn');
+              
+              // 歌曲路径和对应歌词
+              const songs = {
+                'jujiang': {
+                  path: '../music/mayday-jujiang.mp3',
+                  lyrics: '"我和我最后的倔强，握紧双手绝对不放，下一站是不是天堂，就算失望不能绝望"'
+                },
+                'zhizu': {
+                  path: '../music/mayday-zhizu.mp3',
+                  lyrics: '"怎么去拥有一道彩虹，怎么去拥抱一夏天的风，天上的星星笑地上的人"'
+                },
+                'wenrou': {
+                  path: '../music/mayday-wenrou.mp3',
+                  lyrics: '"你问我全世界是哪里最美，答案是你身边"'
+                },
+                'ruyan': {
+                  path: '../music/mayday-ruyan.mp3',
+                  lyrics: '"那一天 那一刻 那个场景，你出现在我生命"'
+                }
+              };
+              
+              // 设置音频源和歌词
+              audio.src = songs[song].path;
+              lyricsDisplay.textContent = songs[song].lyrics;
+              
+              // // 显示播放按钮
+              // playButton.style.display = 'inline-block';
+              // playButton.textContent = '播放';
+              
+              // // 设置播放按钮事件
+              // playButton.onclick = function() {
+              //   if (audio.paused) {
+              //     audio.play();
+              //     this.textContent = '暂停';
+              //   } else {
+              //     audio.pause();
+              //     this.textContent = '播放';
+              //   }
+              // };
+            }
+          </script>
+        </div>
+
+        <!--第三屏-->
+
+        <div class="section">
+          <div class="timeline"></div>
+          <div class="timepoint21"></div>
+          <div class="ly-box21">
+            <div class="ly-txt21" style="width:100%;height:10%;left:10%">
+              <img class="ly-img11" src="../img/HappyBirthday.png" style="width:200%;height:100%">
+            </div>
+            <div class="ly-txt22" style="left:20%;font-size: 45px">
+              <p>祝</p>
+              <p>你</p>
+            </div>
+            <div class="ly-imgbox21">
+              <img class="ly-img21"
+                src="https://img1.baidu.com/it/u=1126911312,3317101426&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500">
+            </div>
+          </div>
+          <div class="ly-triangle21"></div>
+
+          <div class="ly-box22">
+            <div class="ly-txt23" style="width:100%;height:10%;left:10%">
+              <img class="ly-img11" src="../img/HappyBirthday.png" style="width:200%;height:100%">
+            </div>
+            <div class="ly-txt24">
+              <p>百事可乐</p>
+              <p>万事芬达</p>
+              <p>天天哇哈哈</p>
+              <p>月月乐百事</p>
+              <p>心情似雪碧</p>
+              <p>永远心飞扬</p>
+            </div>
+            <div class="ly-imgbox22">
+              <img class="ly-img22" src="../img/cmdx.jpg">
+            </div>
+          </div>
+          <div class="ly-triangle22"></div>
+
+          <div class="ly-box23">
+            <div class="ly-imgbox23" style="height: 100%">
+              <div class="puzzle-game">
+                <h3>五月天拼图挑战</h3>
+                
+                <div class="difficulty-selector">
+                  <button class="diff-btn active" onclick="setDifficulty(3)">简单</button>
+                  <button class="diff-btn" onclick="setDifficulty(4)">中等</button>
+                  <button class="diff-btn" onclick="setDifficulty(5)">困难</button>
+                </div>
+                
+                <div id="puzzle-container" style="display: none;"></div>
+                
+                <div id="preview-image">
+                  <img src="../img/五月天.jpg" alt="五月天专辑封面">
+            </div>
+                
+                <button id="start-puzzle">开始游戏</button>
+                
+                <div id="swap-count"></div>
+                
+                <div id="completion-message">
+                  <p>恭喜你完成拼图！</p>
+                  <p>"如果岁月可以这样安排，让我们永远不必再告别"</p>
+                  <p>生日快乐，愿你的生活如五月天的音乐一样精彩！</p>
+            </div>
+            </div>
+          </div>
+             
+        
+        </div>
+          
+         
+          
+          <script>
+            let puzzleSize = 3; // 默认难度
+    let pieces = []; // 拼图块逻辑位置
+    let pieceElements = []; // 拼图块 DOM 元素
+    let emptyCell = {}; // 空白格子位置
+    let isPlaying = false;
+    let swapCount = 5; // 交换次数限制
+    let selectedPiece = null; // 当前选中的拼图块
+
+    // 设置难度
+    function setDifficulty(size) {
+      puzzleSize = size;
+      document.querySelectorAll('.diff-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+
+    // 开始/重置游戏
+    document.getElementById('start-puzzle').addEventListener('click', function() {
+      if (!isPlaying) {
+        startPuzzle();
+        this.textContent = '重新开始';
+      } else {
+        resetPuzzle();
+      }
+    });
+
+    // 开始拼图
+    function startPuzzle() {
+      isPlaying = true;
+      swapCount = 10; // 重置交换次数
+      selectedPiece = null;
+      updateSwapCount();
+      document.getElementById('puzzle-container').style.display = 'block';
+      document.getElementById('completion-message').style.display = 'none';
+      createPuzzle();
+    }
+
+    // 重置拼图
+    function resetPuzzle() {
+      const container = document.getElementById('puzzle-container');
+      container.innerHTML = '';
+      startPuzzle();
+    }
+
+    // 创建拼图
+    function createPuzzle() {
+      const container = document.getElementById('puzzle-container');
+      container.innerHTML = '';
+      const pieceSize = 300 / puzzleSize;
+
+      // 初始化拼图数组
+      pieces = Array(puzzleSize * puzzleSize).fill(null);
+      pieceElements = [];
+      for (let i = 0; i < puzzleSize * puzzleSize - 1; i++) {
+        pieces[i] = i;
+      }
+      emptyCell = { row: puzzleSize - 1, col: puzzleSize - 1 };
+
+      // 打乱拼图
+      shufflePuzzle();
+
+      // 创建拼图块
+      for (let i = 0; i < puzzleSize; i++) {
+        for (let j = 0; j < puzzleSize; j++) {
+          const index = i * puzzleSize + j;
+          const pieceValue = pieces[index];
+
+          if (pieceValue !== null) {
+            const piece = document.createElement('div');
+            piece.className = 'puzzle-piece';
+            piece.style.width = pieceSize + 'px';
+            piece.style.height = pieceSize + 'px';
+            piece.style.left = (j * pieceSize) + 'px';
+            piece.style.top = (i * pieceSize) + 'px';
+            piece.style.backgroundImage = "url('../img/五月天.jpg')";
+            piece.style.backgroundSize = `${pieceSize * puzzleSize}px ${pieceSize * puzzleSize}px`;
+
+            // 设置背景位置
+            const bgRow = Math.floor(pieceValue / puzzleSize);
+            const bgCol = pieceValue % puzzleSize;
+            piece.style.backgroundPosition = `${-(bgCol * pieceSize)}px ${-(bgRow * pieceSize)}px`;
+
+            piece.dataset.value = pieceValue;
+            piece.dataset.currentIndex = index;
+
+            // 点击事件：移动或选择交换
+            piece.addEventListener('click', function() {
+              const currentIndex = parseInt(this.dataset.currentIndex);
+              const row = Math.floor(currentIndex / puzzleSize);
+              const col = currentIndex % puzzleSize;
+
+              if (selectedPiece) {
+                // 如果已经选中一个拼图块，则尝试交换
+                swapPieces(selectedPiece, this);
+                selectedPiece.classList.remove('selected');
+                selectedPiece = null;
+              } else if (canMove(row, col)) {
+                // 如果未选中拼图块且可以移动，则执行移动
+                movePiece(this, row, col, currentIndex);
+              } else if (swapCount > 0) {
+                // 如果不能移动且有交换次数，则选中此拼图块
+                this.classList.add('selected');
+                selectedPiece = this;
+              }
+            });
+
+            container.appendChild(piece);
+            pieceElements[index] = piece;
+          }
+        }
+      }
+    }
+
+    // 检查是否可以移动
+    function canMove(row, col) {
+      return (
+        (Math.abs(row - emptyCell.row) === 1 && col === emptyCell.col) ||
+        (Math.abs(col - emptyCell.col) === 1 && row === emptyCell.row)
+      );
+    }
+
+    // 移动拼图块
+    function movePiece(piece, row, col, currentIndex) {
+      const emptyIndex = emptyCell.row * puzzleSize + emptyCell.col;
+      const pieceSize = 300 / puzzleSize;
+
+      pieces[emptyIndex] = pieces[currentIndex];
+      pieces[currentIndex] = null;
+      piece.dataset.currentIndex = emptyIndex;
+
+      piece.style.left = (emptyCell.col * pieceSize) + 'px';
+      piece.style.top = (emptyCell.row * pieceSize) + 'px';
+
+      emptyCell.row = row;
+      emptyCell.col = col;
+
+      checkCompletion();
+    }
+
+    // 交换两个拼图块
+    function swapPieces(piece1, piece2) {
+      if (swapCount <= 0 || piece1 === piece2) return;
+
+      const index1 = parseInt(piece1.dataset.currentIndex);
+      const index2 = parseInt(piece2.dataset.currentIndex);
+      const pieceSize = 300 / puzzleSize;
+
+      // 交换 pieces 数组中的值
+      [pieces[index1], pieces[index2]] = [pieces[index2], pieces[index1]];
+
+      // 更新 DOM 位置
+      const tempLeft = piece1.style.left;
+      const tempTop = piece1.style.top;
+      piece1.style.left = piece2.style.left;
+      piece1.style.top = piece2.style.top;
+      piece2.style.left = tempLeft;
+      piece2.style.top = tempTop;
+
+      // 更新 currentIndex
+      piece1.dataset.currentIndex = index2;
+      piece2.dataset.currentIndex = index1;
+
+      // 如果交换涉及空白格子，更新 emptyCell
+      if (pieces[index1] === null) {
+        emptyCell.row = Math.floor(index1 / puzzleSize);
+        emptyCell.col = index1 % puzzleSize;
+      } else if (pieces[index2] === null) {
+        emptyCell.row = Math.floor(index2 / puzzleSize);
+        emptyCell.col = index2 % puzzleSize;
+      }
+
+      swapCount--;
+      updateSwapCount();
+      checkCompletion();
+    }
+
+    // 打乱拼图
+    function shufflePuzzle() {
+      for (let i = 0; i < 200; i++) {
+        const possibleMoves = [];
+        if (emptyCell.row > 0) possibleMoves.push({ row: emptyCell.row - 1, col: emptyCell.col });
+        if (emptyCell.row < puzzleSize - 1) possibleMoves.push({ row: emptyCell.row + 1, col: emptyCell.col });
+        if (emptyCell.col > 0) possibleMoves.push({ row: emptyCell.row, col: emptyCell.col - 1 });
+        if (emptyCell.col < puzzleSize - 1) possibleMoves.push({ row: emptyCell.row, col: emptyCell.col + 1 });
+
+        const move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+        const moveIndex = move.row * puzzleSize + move.col;
+        const emptyIndex = emptyCell.row * puzzleSize + emptyCell.col;
+
+        pieces[emptyIndex] = pieces[moveIndex];
+        pieces[moveIndex] = null;
+        emptyCell.row = move.row;
+        emptyCell.col = move.col;
+      }
+    }
+
+    // 检查拼图是否完成
+    function checkCompletion() {
+      let completed = true;
+      for (let i = 0; i < puzzleSize * puzzleSize - 1; i++) {
+        if (pieces[i] !== i) {
+          completed = false;
+          break;
+        }
+      }
+      if (completed && pieces[puzzleSize * puzzleSize - 1] === null) {
+        document.getElementById('puzzle-container').style.display = 'none';
+        document.getElementById('completion-message').style.display = 'block';
+        document.getElementById('start-puzzle').textContent = '再玩一次';
+        isPlaying = false;
+      }
+    }
+
+    // 更新交换次数显示
+    function updateSwapCount() {
+      document.getElementById('swap-count').textContent = `剩余任意交换次数：${swapCount}`;
+    }
+  </script>
+        </div>
+
+        <!--第四屏-->
+
+        <div class="section">
+          <div class="timeline"></div>
+          <div class="timepoint31"></div>
+          <div class="ly-box31">
+            <div class="ly-txt31" style="width:100%;height:10%;left:10%">
+              <img class="ly-img11" src="../img/HappyBirthday.png" style="width:100%;height:100%">
+            </div>
+            <div class="ly-txt32">
+              <p>愿你</p>
+              <p>贪吃不胖，努力不负，傻人傻福，</p>
+              <p>一直幸运。一生努力，一生被爱，</p>
+              <p>想要的都拥有，得不到的都释怀。🌈</p>
+            </div>
+            <div class="ly-imgbox31" style="height:50%">
+              <img class="ly-img31" src="../img/hu1.JPG" style="height:100%">
+            </div>
+          </div>
+          <div class="ly-triangle31"></div>
+
+          <div class="ly-box32">
+            <div class="ly-txt33" style="width:100%;height:15%;left:10%">
+              <img class="ly-img11" src="../img/HappyBirthday.png" style="width:100%;height:100%">
+            </div>
+            <div class="ly-txt34">
+              <p>
+                此刻把眼睛闭上，你会看到一根点亮的蜡烛</p>
+              <p>去许个愿望吧!</p>
+            </div>
+            <div class="ly-imgbox311">
+              <img class="ly-img31" src="../img/axinchagge.jpg" style="height:100%">
+            </div>
+         
+              <!-- 猜歌词小游戏 -->
+          <div class="lyrics-game" style="position: absolute; bottom: 0px; left: 50%; transform: translateX(-50%); width: 100%; background: rgba(0,0,0,0.8); border-radius: 15px; padding: 10px; z-index: 100; text-align: center;">
+            <h3 style="color: #f5b663; margin-bottom: 15px; font-size: 22px;">猜猜五月天歌词</h3>
+            
+            <div id="game-container">
+              <div id="game-intro" style="color: #fff; margin-bottom: 20px;">
+                <p>猜一猜缺失的歌词。答对五题解锁神秘生日祝福！</p>
+                <button id="start-lyrics-game" style="background: #f5b663; border: none; color: #333; padding: 8px 20px; border-radius: 20px; cursor: pointer; margin-top: 10px;">开始挑战</button>
+              </div>
+              
+              <div id="game-play" style="display: none;">
+                <div id="current-question" style="color: #fff; font-size: 18px; margin-bottom: 15px;"></div>
+                
+                <div id="audio-container" style="display: none;">
+                  <audio id="song-audio" controls style="width: 100%;">
+                    <source src="" type="audio/mpeg">
+                  </audio>
+                </div>
+                
+                <div id="lyrics-display" style="color: #fff; font-size: 16px; font-style: italic; margin-bottom: 20px; line-height: 1.6;"></div>
+                
+                <div id="answer-input" style="margin-bottom: 15px;">
+                  <input type="text" id="user-answer" placeholder="填写缺失的歌词(回车键提交)" style="padding: 8px 15px; width: 70%; border-radius: 20px; border: none; margin-right: 10px;">
+                  <!-- <button id="submit-answer" style="background: #f5b663; border: none; color: #333; padding: 8px 15px; border-radius: 20px; cursor: pointer;">提交</button> -->
+                </div>
+                
+                <div id="feedback" style="color: #fff; font-size: 20px; height: 20px; margin-bottom: 5px;"></div>
+                
+                <!-- <div id="hint-container" style="margin-top: 10px;">
+                  <button id="show-hint" style="background: transparent; border: 1px solid #f5b663; color: #f5b663; padding: 5px 10px; border-radius: 15px; cursor: pointer;">显示提示</button>
+                  <p id="hint-text" style="color: #ccc; font-size: 14px; margin-top: 10px; display: none;"></p>
+                </div> -->
+                
+                <div id="progress" style="color: #f5b663; margin-top: 15px;">
+                 <span id="correct-count" style="display: none;">0</span>
+                </div>
+              </div>
+              
+              <div id="game-complete" style="display: none; color: #fff;">
+                <p style="font-size: 20px; margin-bottom: 15px;">恭喜你完成了所有挑战！</p>
+                <div style="background: url('../img/axincaomei.jpg') no-repeat center; background-size: cover; width: 300px; height: 200px; margin: 0 auto 20px; border-radius: 10px; position: relative;">
+                  <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: transparent; padding: 15px; border-radius: 10px; width: 80%;">
+                    <p style="color: #f5b663; font-size: 18px;">五月天陪你一起过生日！</p>
+                    <p style="color: #fff; font-size: 16px; margin-top: 10px;">愿你如《倔强》般坚定，像《知足》般快乐，如《温柔》般美好！</p>
+                  </div>
+                </div>
+                <button id="restart-game" style="background: #f5b663; border: none; color: #333; padding: 8px 20px; border-radius: 20px; cursor: pointer; margin-top: 10px;">再玩一次</button>
+              </div>
+            </div>
+          </div>
+           
+          </div>
+          <div class="ly-triangle32"></div>
+          
+        
+          
+          <script>
+            // 歌曲数据
+            const lyricsQuestions = [
+              {
+                songTitle: "倔强",
+                audioSrc: "../music/juejiang.MP3",
+                lyrics: "这一次为自己___，就这一次 我和我的倔强",
+                answer: "疯狂",
+                hint: ""
+              },
+              {
+                songTitle: "知足",
+                audioSrc: "../music/zhizu.MP3",
+                lyrics: "如果我爱上你的___，要怎么收藏要怎么拥有",
+                answer: "笑容",
+                hint: ""
+              },
+              {
+                songTitle: "温柔",
+                audioSrc: "../music/wenrou.MP3",
+                lyrics: "不打扰，是我的___",
+                answer: "温柔",
+                hint: ""
+              },
+              {
+                songTitle: "如果我们不曾相遇",
+                audioSrc: "../music/rugyuowomenbucengxiangyu.MP3",
+                lyrics: "那一天 那一刻 那个场景，你出现在我___",
+                answer: "生命",
+                hint: ""
+              },
+              {
+                songTitle: "突然好想你",
+                audioSrc: "../music/turanhaoxiangni.MP3",
+                lyrics: "___，你会在哪里，过得快乐或委屈",
+                answer: "突然好想你",
+                hint: ""
+              },
+              {
+                songTitle: "我不愿 让你一个人",
+                audioSrc: "../music/wobuyuanrangniyigeren.MP3",
+                lyrics: "我不愿 你独自走过 ___的时分",
+                answer: "风雨",
+                hint: ""
+              },
+              {
+                songTitle: "你不是真正的快乐",
+                audioSrc: "../music/nibushizhenzhengdekuaile.MP3",
+                lyrics: "你值得真正的___，你应该脱下你穿的保护色",
+                answer: "快乐",
+                hint: ""
+              },
+              {
+                songTitle: "干杯",
+                audioSrc: "../music/ganbei.MP3",
+                lyrics: "终究会 有一天 ___都变成昨天",
+                answer: "我们",
+                hint: ""
+              },
+              {
+                songTitle: "后来的我们",
+                audioSrc: "../music/houlaidewomen.MP3",
+                lyrics: "后来的我们我___着，泪水中能看到你真的幸福快乐",
+                answer: "期待",
+                hint: ""
+              },
+              
+            ];
+            
+            let currentQuestionIndex = 0;
+            let correctAnswers = 0;
+            let usedQuestions = [];
+            const audio = document.getElementById('song-audio');
+            let audioEndedHandler = null; // 用于存储事件监听器
+            
+            document.getElementById('start-lyrics-game').addEventListener('click', function() {
+              document.getElementById('game-intro').style.display = 'none';
+              document.getElementById('game-play').style.display = 'block';
+              startLyricsGame();
+            });
+            
+            // document.getElementById('show-hint').addEventListener('click', function() {
+            //   const hintText = document.getElementById('hint-text');
+            //   if (hintText.style.display === 'none') {
+            //     hintText.style.display = 'block';
+            //     this.textContent = '隐藏提示';
+            //   } else {
+            //     hintText.style.display = 'none';
+            //   }
+            // });
+            
+            // document.getElementById('submit-answer').addEventListener('click', checkAnswer);
+            document.getElementById('user-answer').addEventListener('keypress', function(e) {
+              if (e.key === 'Enter') {
+                checkAnswer();
+              }
+            });
+            
+            document.getElementById('restart-game').addEventListener('click', function() {
+              correctAnswers = 0;
+              usedQuestions = [];
+              document.getElementById('game-complete').style.display = 'none';
+              document.getElementById('game-play').style.display = 'block';
+              document.getElementById('correct-count').textContent = correctAnswers;
+              startLyricsGame();
+            });
+            
+            function startLyricsGame() {
+
+              // 移除之前的 ended 事件监听器，避免重复绑定
+              if (audioEndedHandler) {
+                audio.removeEventListener('ended', audioEndedHandler);
+              }
+
+              // 随机选择一个问题 juejiang.MP3
+              selectRandomQuestion();
+              
+              // 设置问题内容
+              const currentQuestion = lyricsQuestions[currentQuestionIndex];
+              document.getElementById('current-question').textContent = `歌曲：${currentQuestion.songTitle}`;
+              document.getElementById('lyrics-display').textContent = currentQuestion.lyrics;
+              // document.getElementById('hint-text').textContent = `提示：${currentQuestion.hint}`;
+              // document.getElementById('hint-text').style.display = 'none';
+              // document.getElementById('show-hint').textContent = '显示提示';
+              document.getElementById('feedback').textContent = '';
+              document.getElementById('user-answer').value = '';
+              
+              // 设置音频
+              // const audio = document.getElementById('song-audio');
+              audio.src = currentQuestion.audioSrc;
+              audio.load();
+            }
+            
+            function selectRandomQuestion() {
+              // 选择一个尚未使用的问题
+              if (usedQuestions.length === lyricsQuestions.length) {
+                // 如果所有问题都已使用，重置
+                usedQuestions = [];
+              }
+              
+              let randomIndex;
+              do {
+                randomIndex = Math.floor(Math.random() * lyricsQuestions.length);
+              } while (usedQuestions.includes(randomIndex));
+              
+              currentQuestionIndex = randomIndex;
+              usedQuestions.push(randomIndex);
+            }
+            
+            function checkAnswer() {
+              const userAnswer = document.getElementById('user-answer').value.trim();
+              const correctAnswer = lyricsQuestions[currentQuestionIndex].answer;
+              const feedback = document.getElementById('feedback');
+              
+              if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+                feedback.textContent = '答对了！';
+                feedback.style.color = '#4CAF50';
+                correctAnswers++;
+                document.getElementById('correct-count').textContent = correctAnswers;
+                // 答对后自动播放音频
+                audio.currentTime = 0; // 重置音频到开头
+                audio.play();
+
+                // 定义 ended 事件处理函数
+                audioEndedHandler = function() {
+                  if (correctAnswers >= 10) {
+                    document.getElementById('game-play').style.display = 'none';
+                    document.getElementById('game-complete').style.display = 'block';
+                  } else {
+                    startLyricsGame();
+                  }
+                };
+
+                // 添加 ended 事件监听器
+                audio.addEventListener('ended', audioEndedHandler);
+              } else {
+                feedback.textContent = '答错了，再试试吧！';
+                feedback.style.color = '#F44336';
+              }
+            }
+          </script>
+        </div>
+
+        <!--第四屏-->
+
+        <div class="section">
+          <div class="timeline"></div>
+          <div class="timepoint11"></div>
+          <div class="ly-box81">
+            <div class="ly-txt11" style="width:100%;height:10%;left:10%">
+              <img class="ly-img11" src="../img/HappyBirthday.png" style="width:200%;height:200%">
+            </div>
+            <div class="ly-txt82" style="top:8%">
+              <p class="wwww1">来自海旭的祝福</p>
+              <p class="wwww1">关于此事我又总结了以下几点：</p>
+              <p class="wwww1">。。。。。。。。。。。。。</p>
+              <p class="wwww1">算了，简单说几句吧</p>
+              <p class="wwww1">▷ ︎ı||ııı||ı|ı||ııı||ı| 59''</p>
+              <p class="wwww1">相信你能听懂吧(doge)</p>
+            </div>
+            <div class="ly-imgbox81">
+              <img class="ly-img81" src="../img/ghibi_image.png">
+            </div>
+          </div>
+          <div class="ly-triangle11"></div>
+
+          <div class="ly-box82">
+            <div class="ly-txt13" style="width:100%;height:10%;left:10%">
+              <img class="ly-img11" src="../img/HappyBirthday.png" style="width:100%;height:100%">
+            </div>
+            <div class="ly-txt84">
+              <p>哈哈哈还是我来给你翻译一下吧：</p>
+              <p>Hi!妲菲，今天是你的生日!</p>
+
+              <p>在这个时刻，首先送上我的祝福，希望2025身体健康，所有的烦恼统统全忘掉。</p>
+
+              <p>虽然又老了一岁（doge），但是希望每天都能开开心心，吃特别多的好吃的，咋吃都不胖，</p>
+              <p>去特别多好玩的地方，咋玩都不会累。哈哈哈</p>
+              <p>在最好的年华，奔走在自己的热爱里。</p>
+
+              <p>最后我再给你讲个故事</p>
+              <p>有一天啊，有一位大师抓了一只小猪，没留意,让猪给跑了</p>
+              <p>你知道小猪跑哪里去了吗？原来这猪十分的有灵性</p>
+              <p>听见我在讲故事就跑来听故事了 哈哈哈哈哈呵呵哈哈哈（doge）</p>
+              <hr>
+            
+              <p>莞尔一笑，嫣然绽放。捡一朵🌸，哼唱五月天的歌</p>
+               <p>春光易逝，但下一次的丰收之旅，已在《人生海海》中启航！</p>
+              <p><a href="./EasterEgg.html">我劝你不要点这里！！！</a> </p>
+              
+              <!-- 添加五月天虚拟演唱会链接 -->
+              <!-- <div class="mayday-concert-link" style="margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.7); border-radius: 10px; text-align: center;">
+                <p style="color: #f5b663; font-size: 18px; margin-bottom: 10px;">五月天为你准备了专属演唱会！</p>
+                <a href="./MaydayConcert.html" style="display: inline-block; background: #f5b663; color: #333; padding: 8px 20px; border-radius: 20px; text-decoration: none; font-weight: bold;">点击进入虚拟演唱会</a>
+              </div> -->
+            </div>
+
+          </div>
+          <div class="ly-triangle82"></div>
+        </div>
+      </div>
+
+    </div>
+    <!--试验-->
+    <ul class="bg-bubbles">
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+    </ul>
+
+  </div>
+
+  <script>
+
+    // 修改音乐自动播放
+    const audio1 = document.createElement("audio");
+        audio1.src = "../music/yuyinniaoniao.MP3";
+        audio1.autoplay = true;
+        audio1.loop = true; // 添加循环播放
+        document.body.appendChild(audio1);
+
+        // 确保音乐在页面加载时播放
+        document.addEventListener('DOMContentLoaded', function() {
+            audio1.play().catch(function(error) {
+                console.log("自动播放被阻止:", error);
+                // 添加用户交互后播放的备用方案
+                document.body.addEventListener('click', function() {
+                    audio1.play();
+                }, { once: true });
+            });
+        });
+  </script>
+  <!-- <audio src="../music/余音袅袅 - 瞬间的永恒 (节目).mp3" autoplay="autoplay" loop="loop"> -->
+
+    <script src="../js/jquery-1.8.3.min.js"></script>
+    <script src="../js/jquery.fullPage.min.js"></script>
+    <script src="../js/diy.js"></script>
+</body>
+
+</html>
